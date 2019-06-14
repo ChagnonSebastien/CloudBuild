@@ -1,0 +1,13 @@
+steps:
+- name: 'gcr.io/cloud-builders/mvn'
+  args: [ 'clean', 'install' ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/staging/$_APP_NAME', '.' ]
+- name: 'ubuntu'
+  args: [ 'bash', './build-scripts/version.bash' ]
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: '/bin/bash'
+  env: [ 'PROJECT_ID=$PROJECT_ID', 'APP_NAME=$_APP_NAME', BUILD_ID=$BUILD_ID, BUILD_ENVIRONEMENT=staging ]
+  args: [ './build-scripts/docker-tag-versions.bash' ]
+images:
+- 'gcr.io/$PROJECT_ID/staging/$_APP_NAME'
